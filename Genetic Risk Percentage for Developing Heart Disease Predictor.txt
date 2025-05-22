@@ -1,0 +1,67 @@
+# This program calculates a user's genetic risk percentage for developing heart disease.
+
+# It does the following:
+# 1. Asks the user if they have a family history of heart disease, which affects the risk multiplier.
+# 2. Prompts the user to enter genotypes for 23 unique SNPs.
+# 3. Validates each genotype to ensure it follows the correct format.
+# 4. Compares each user-provided genotype to a corresponding known "risk allele.”
+# 5. Increments a risk score if the user's genotype includes the matching risk allele.
+# 6. Uses a risk factor to weigh the score.
+# 7. Outputs the final genetic risk as a percentage likelihood of developing heart disease.
+
+genoset = []
+riskAllele = ["G","G","G","G","A","C","A","A","G","T","C","A","C","A","C","T","A","G","C","A","A","T","G"]
+snps = ["rs2383206","rs10757278","rs2383207","rs10757274","rs4665058","rs1333049","rs383830","rs6922269","rs8055236","rs688034","rs2943634","rs599839","rs17465637","rs501120","rs17228212","rs2713604","rs3803","rs662799","rs3135506","rs1676232","rs4404477","rs3918242","rs17576"]
+
+def riskCounter(riskFactor):
+  riskCount = 0
+  for genotype in genoset:
+    for char in genotype:
+      if char == riskAllele[genoset.index(genotype)]:
+        riskCount = riskCount + riskFactor
+  return(riskCount)
+
+riskFactor = 0
+greaterSusceptibility = False
+
+familyHistory = (input("Does your family health history include heart disease? (Y/N) ")).upper()
+familyHistoryAnswered = False
+
+while familyHistoryAnswered is False:
+  if familyHistory == "Y" or familyHistory == "YES":
+    greaterSusceptibility = True
+    familyHistoryAnswered = True
+  elif familyHistory == "N" or familyHistory == "NO":
+    greaterSusceptibility = False
+    familyHistoryAnswered = True
+  else:
+    familyHistory = (input("Try again. Enter answer as a Y/N.\nDoes your family health history include heart disease? (Y/N) ")).upper()
+
+for snp in snps:
+  genotypeAccepted = False
+  while genotypeAccepted is False:
+    genotype = (input("What is your genotype at genetic marker " + snp + "? ")).upper()
+    genotypeValidCharacterCount = 0
+    genotypeStringSize = 0
+    for char in genotype:
+      if char == "A" or char == "T" or char == "C" or char == "G" or char == "-":
+        genotypeValidCharacterCount = genotypeValidCharacterCount + 1
+      genotypeStringSize = genotypeStringSize + 1
+    if genotypeValidCharacterCount == 2 and genotypeStringSize == 3:
+      charPlaceCount = 1
+      for char in genotype:
+        if charPlaceCount == 2 and (char == "/" or char == ":"):
+          genoset.append(genotype)
+          genotypeAccepted = True
+        charPlaceCount = charPlaceCount + 1
+      if genotypeAccepted is False:
+        print("Invalid genotype format. Please try again.")
+    else:
+      print("Invalid genotype format. Please try again.")
+
+if greaterSusceptibility is True:
+  riskFactor = 0.475
+elif greaterSusceptibility is False:
+  riskFactor = 0.339
+  
+print("You have a " + str(round(((riskCounter(riskFactor)/len(genoset))*100),2)) + "% chance of developing a heart disease.")
